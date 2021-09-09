@@ -33,3 +33,50 @@ resource "aws_db_instance" "target" {
     created_by  = "terraform"
   }
 }
+
+resource "postgresql_database" "my_db1" {
+  name              = "my_db1"
+  owner             = "my_role1"
+  template          = "template0"
+  lc_collate        = "C"
+  connection_limit  = -1
+  allow_connections = true
+  depends_on = [aws_db_instance.default]
+}
+
+resource "postgresql_role" "my_role1" {
+  name     = "my_role1"
+  login    = true
+  password = "mypass"
+}
+
+resource "postgresql_database" "my_db" {
+  name              = "my_db"
+  owner             = "my_role"
+  template          = "template0"
+  lc_collate        = "C"
+  connection_limit  = -1
+  allow_connections = true
+}
+
+resource "postgresql_role" "my_role" {
+  name     = "my_role"
+  login    = true
+  password = "mypass"
+}
+
+ terraform {
+  required_providers {
+    postgresql = {
+      source = "cyrilgdn/postgresql"
+      version = "1.13.0"
+    }
+  }
+}
+
+provider "postgresql" {
+  host = "${aws_db_instance.default.address}"
+  username = "${aws_db_instance.default.username}"
+  password = "${aws_db_instance.default.password}"
+  superuser = false
+}

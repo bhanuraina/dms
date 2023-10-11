@@ -1,18 +1,29 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: Create Repository from Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Name of the new repository'
+        required: true
+
 jobs:
-  Explore-GitHub-Actions:
+  create-repo:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Create Repository
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        REPO_NAME=${{ github.repository_owner }}/${{ github.event.inputs.repo_name }}
+        TEMPLATE_REPO=yourusername/templaterepo
+        ACCESS_TOKEN=$GH_PAT
+        API_URL="https://api.github.com/repos/$TEMPLATE_REPO/generate"
+        
+        response=$(curl -X POST -H "Authorization: token $ACCESS_TOKEN" -d "{\"owner\":\"${{ github.repository_owner }}\",\"name\":\"${{ github.event.inputs.repo_name }}\"}" $API_URL)
+        
+        echo "$response"

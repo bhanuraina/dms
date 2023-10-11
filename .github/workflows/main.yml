@@ -20,7 +20,7 @@ jobs:
         GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         REPO_NAME=${{ github.repository_owner }}/${{ github.event.inputs.repo_name }}
-        TEMPLATE_REPO=yourusername/templaterepo
+        TEMPLATE_REPO=bhanuraina/simple-java-maven-app
         ACCESS_TOKEN=$GH_PAT
         API_URL="https://api.github.com/repos/$TEMPLATE_REPO/generate"
         
